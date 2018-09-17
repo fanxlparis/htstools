@@ -1,0 +1,14 @@
+# Linux Dolphin directory attributes files
+.directory
+
+# macOS Finder directory attributes files
+.DS_Store
+
+# CMake build directory
+build/
+
+# Doxygen HTML documentation directory
+documentation/html/
+
+# Temporary output directory
+tmp/
