@@ -1,99 +1,83 @@
-#/bin/bash
+#!/usr/bin/env bash
+
+
+# =========================================================================== #
+#              Apply BQSR according to the GATK Best Practices                #
+# =========================================================================== #
+
+
+# !!!!!!!!!!!!!!! YOUR CUSTOM PATHS MIGHT BE REQUIRED HERE !!!!!!!!!!!!!!!!!!!!
+readonly num_threads=2
+readonly input_bam="ERR174310.aln.sort.dupmark.bam"
+# Output file will be $output_prefix.recal.bam
+readonly output_prefix="ERR174310.aln.sort.dupmark"
+readonly gatk_bundle_path="/home/voges/tmp/GATK_bundle-2.8-b37"
+# !!!!!!!!!!!!!!! YOUR CUSTOM PATHS MIGHT BE REQUIRED HERE !!!!!!!!!!!!!!!!!!!!
 
 
 # -----------------------------------------------------------------------------
-# Constants
+# Command line
 # -----------------------------------------------------------------------------
 
 readonly SCRIPT_NAME="$(basename $0)"
 
-
-# -----------------------------------------------------------------------------
-# Functions
-# -----------------------------------------------------------------------------
-
-safe_execute ()
-{
-    local readonly command=("$@")
-    "${command[@]}"
-    # "${command[@]}" &> /dev/null
-    local readonly return_code=$?
-    if [ $return_code -ne 0 ]; then
-        cmd="${command[@]}"
-        printf "$SCRIPT_NAME: error: '$cmd' returned with non-zero status\n"
-        exit -1
-    fi
-}
-
-
-# -----------------------------------------------------------------------------
-# Parse command line.
-# -----------------------------------------------------------------------------
-
 if [ "$#" -ne 0 ]; then
-    printf "$SCRIPT_NAME: usage: $0\n";
+    printf "$SCRIPT_NAME: usage: $0\n"
+    printf "$SCRIPT_NAME: (hint: set parameters directly in the script)\n";
     exit -1;
 fi
 
 
+
 # -----------------------------------------------------------------------------
-# Input files
+# GATK bundle
 # -----------------------------------------------------------------------------
 
-readonly reference_fasta=""
-readonly input_bam=""
-readonly dbsnp_vcf=""
+readonly ref_fasta="$gatk_bundle_path/human_g1k_v37.fasta"
+readonly dbsnps_vcf="$gatk_bundle_path/dbsnp_138.b37.vcf"
 
-if [ ! -f $reference_fasta ]; then
-    printf "$SCRIPT_NAME: error: '$reference_fasta' is not a regular file\n"
-    exit -1
-fi
-
-if [ ! -f $input_bam ]; then
-    printf "$SCRIPT_NAME: error: '$input_bam' is not a regular file\n"
-    exit -1
-fi
-
-if [ ! -f $dbsnp_vcf ]; then
-    printf "$SCRIPT_NAME: error: '$dbsnp_vcf' is not a regular file\n"
+# Check if the reference is indexed.
+if [ ! -f "${ref_fasta}.fai" ]; then
+    printf "$SCRIPT_NAME: error: reference '$ref_fasta' not indexed\n"
+    printf "$SCRIPT_NAME: (hint: use 'samtools faidx ref.fasta')\n"
     exit -1
 fi
 
 
 # -----------------------------------------------------------------------------
-# Check if required executables are available.
+# Required programs
 # -----------------------------------------------------------------------------
 
-# !!!!!!!!!!!!!!! YOUR CUSTOM PATHS MIGHT BE REQUIRED HERE !!!!!!!!!!!!!!!!!!!!
-readonly gatk="/project/omics/bin/gatk-4.0"
-# !!!!!!!!!!!!!!! YOUR CUSTOM PATHS MIGHT BE REQUIRED HERE !!!!!!!!!!!!!!!!!!!!
-
-if [ ! -x $gatk ]; then
-    printf "$SCRIPT_NAME: binary file '$gatk' is not executable\n"
-    exit -1
-fi
+readonly gatk="/project/omics/install/gatk-4.0.8.1/gatk"
 
 
 # -----------------------------------------------------------------------------
-# run the BaseRecalibrator
+# Do it!
 # -----------------------------------------------------------------------------
 
+# Run the BaseRecalibrator.
+printf "$SCRIPT_NAME: running GATK's BaseRecalibrator\n"
 $gatk \
     -T BaseRecalibrator \
-    -R $reference_fasta \
+    -R $ref_fasta \
     -I $input_bam \
     -knownSites $dbsnp_vcf \
-    -o $input_bam.recal_data.table
+    -o $output_prefix.bam.recal_data.table
+if [ $? -ne 0 ]; then
+    printf "$SCRIPT_NAME: error: GATK returned with non-zero status\n"
+    exit -1
+fi
 
-
-# -----------------------------------------------------------------------------
-# create recalibrated BAM
-# -----------------------------------------------------------------------------
-
+# Create recalibrated BAM.
+printf "$SCRIPT_NAME: creating recalibrated BAM\n"
 $gatk \
     -T PrintReads \
-    -R $reference_fasta \
+    -R $ref_fasta \
     -I $input_bam \
-    -BQSR $recalibration_report_grp \
-    -o $output_bam
+    -BQSR $input_bam.recalibration_report.grp \
+    -o $output_prefix.recal.bam
     --emit_original_quals # emit the OQ tag with the original base qualities
+if [ $? -ne 0 ]; then
+    printf "$SCRIPT_NAME: error: GATK returned with non-zero status\n"
+    exit -1
+fi

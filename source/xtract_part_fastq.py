@@ -6,7 +6,7 @@ import sys
 
 
 def main():
-    script_name = 'xtract-part-fastq.py'
+    script_name = 'xtract_part_fastq.py'
 
     # set up the command line parser
     parser = argparse.ArgumentParser(
