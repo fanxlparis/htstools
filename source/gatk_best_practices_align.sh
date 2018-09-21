@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
 
-# =========================================================================== #
-#         Perform alignment according to the GATK Best Practices              #
-# =========================================================================== #
+# =============================================================================
+#         Perform alignment according to the GATK Best Practices
+# =============================================================================
 
 
 # !!!!!!!!!!!!!!! YOUR CUSTOM PATHS MIGHT BE REQUIRED HERE !!!!!!!!!!!!!!!!!!!!
 readonly num_threads=2
 readonly input_fastq_1="ERR174310_1.fastq"
 readonly input_fastq_2="ERR174310_2.fastq"
-# Output file will be $output_prefix.aln.sort.dupmark.bam
+# Output file will be: $output_prefix.aln.sort.dupmark.bam
 readonly output_prefix="ERR174310"
 readonly gatk_bundle_path="/home/voges/tmp/GATK_bundle-2.8-b37"
 # !!!!!!!!!!!!!!! YOUR CUSTOM PATHS MIGHT BE REQUIRED HERE !!!!!!!!!!!!!!!!!!!!
@@ -61,6 +61,10 @@ readonly picard_jar="/project/omics/install/picard-tools-2.18.14/picard.jar"
 # Generate BWA index.
 printf "$SCRIPT_NAME: generating BWA index\n"
 $bwa index -a bwtsw $ref_fasta
+if [ $? -ne 0 ]; then
+    printf "$SCRIPT_NAME: error: BWA index returned with non-zero status\n"
+    exit -1
+fi
 
 # Map reads to reference.
 printf "$SCRIPT_NAME: mapping reads to reference\n"
@@ -71,15 +75,15 @@ $bwa mem \
     $input_fastq_2 \
     > $output_prefix.aln.sam
 if [ $? -ne 0 ]; then
-    printf "$SCRIPT_NAME: error: BWA returned with non-zero status\n"
+    printf "$SCRIPT_NAME: error: BWA mem returned with non-zero status\n"
     exit -1
 fi
 
 # Sort SAM file and convert to BAM.
 printf "$SCRIPT_NAME: sorting SAM file (while converting it to BAM)\n"
 $java -jar $picard_jar SortSam \
-    I=$output_prefix.aln.sam \
-    O=$output_prefix.aln.sort.bam \
+    INPUT=$output_prefix.aln.sam \
+    OUTPUT=$output_prefix.aln.sort.bam \
     SORT_ORDER=coordinate
 if [ $? -ne 0 ]; then
     printf "$SCRIPT_NAME: error: Picard returned with non-zero status\n"
@@ -89,9 +93,9 @@ fi
 # Mark duplicates in the BAM file.
 printf "$SCRIPT_NAME: marking duplicates\n"
 $java -jar $picard_jar MarkDuplicates \
-    I=$output_prefix.aln.sort.bam \
-    O=$output_prefix.aln.sort.dupmark.bam \
-    M=$output_prefix.dedup_metrics.txt \
+    INPUT=$output_prefix.aln.sort.bam \
+    OUTPUT=$output_prefix.aln.sort.dupmark.bam \
+    METRICS_FILE=$output_prefix.dedup_metrics.txt \
     ASSUME_SORTED=true
 if [ $? -ne 0 ]; then
     printf "$SCRIPT_NAME: error: Picard returned with non-zero status\n"

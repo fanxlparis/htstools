@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 
-# =========================================================================== #
-#              Apply BQSR according to the GATK Best Practices                #
-# =========================================================================== #
+# =============================================================================
+#              Apply BQSR according to the GATK Best Practices
+# =============================================================================
 
 
 # !!!!!!!!!!!!!!! YOUR CUSTOM PATHS MIGHT BE REQUIRED HERE !!!!!!!!!!!!!!!!!!!!
 readonly num_threads=2
 readonly input_bam="ERR174310.aln.sort.dupmark.bam"
-# Output file will be $output_prefix.recal.bam
+# Output file will be: $output_prefix.recal.bam
 readonly output_prefix="ERR174310.aln.sort.dupmark"
 readonly gatk_bundle_path="/home/voges/tmp/GATK_bundle-2.8-b37"
 # !!!!!!!!!!!!!!! YOUR CUSTOM PATHS MIGHT BE REQUIRED HERE !!!!!!!!!!!!!!!!!!!!
@@ -26,7 +26,6 @@ if [ "$#" -ne 0 ]; then
     printf "$SCRIPT_NAME: (hint: set parameters directly in the script)\n";
     exit -1;
 fi
-
 
 
 # -----------------------------------------------------------------------------
@@ -64,7 +63,7 @@ $gatk \
     -knownSites $dbsnp_vcf \
     -o $output_prefix.bam.recal_data.table
 if [ $? -ne 0 ]; then
-    printf "$SCRIPT_NAME: error: GATK returned with non-zero status\n"
+    printf "$SCRIPT_NAME: error: GATK BaseRecalibrator returned with non-zero status\n"
     exit -1
 fi
 
@@ -78,6 +77,6 @@ $gatk \
     -o $output_prefix.recal.bam
     --emit_original_quals # emit the OQ tag with the original base qualities
 if [ $? -ne 0 ]; then
-    printf "$SCRIPT_NAME: error: GATK returned with non-zero status\n"
+    printf "$SCRIPT_NAME: error: GATK PrintReads returned with non-zero status\n"
     exit -1
 fi
