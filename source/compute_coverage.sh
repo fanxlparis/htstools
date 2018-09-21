@@ -19,7 +19,6 @@ fi
 
 readonly alignments_file=$1
 
-# Check if the input file exists
 if [ ! -f $alignments_file ]; then
     printf "$SCRIPT_NAME: error: '$alignments_file' is not a regular file\n"
     exit -1
@@ -35,7 +34,7 @@ readonly samtools="/project/omics/install/samtools-1.3/bin/samtools"
 
 
 # -----------------------------------------------------------------------------
-# Do it!
+# Do it
 # -----------------------------------------------------------------------------
 
 printf "$SCRIPT_NAME: computing coverage\n"

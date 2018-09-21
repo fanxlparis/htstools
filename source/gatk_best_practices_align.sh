@@ -33,6 +33,7 @@ fi
 # GATK bundle
 # -----------------------------------------------------------------------------
 
+readonly dbsnp_vcf="$gatk_bundle_path/dbsnp_138.b37.vcf"
 readonly ref_fasta="$gatk_bundle_path/human_g1k_v37.fasta"
 
 # Check if the reference is indexed.
@@ -111,3 +112,28 @@ $java -jar $picard_jar AddOrReplaceReadGroups \
     RGPL=illumina \
     RGPU=platform_unit \
     RGSM=sample_name
+
+# Run the BaseRecalibrator.
+printf "$SCRIPT_NAME: running GATK's BaseRecalibrator\n"
+$gatk BaseRecalibrator \
+    --reference $ref_fasta \
+    --input $output_prefix.aln.sort.dupmark.rg.bam \
+    --known-sites $dbsnp_vcf \
+    --output $output_prefix.aln.sort.dupmark.rg.bam.recal_data.table
+if [ $? -ne 0 ]; then
+    printf "$SCRIPT_NAME: error: GATK BaseRecalibrator returned with non-zero status\n"
+    exit -1
+fi
+
+# Create recalibrated BAM.
+printf "$SCRIPT_NAME: creating recalibrated BAM\n"
+$gatk PrintReads \
+    --reference $ref_fasta \
+    --input $output_prefix.aln.sort.dupmark.rg.bam \
+    --BQSR $output_prefix.aln.sort.dupmark.rg.bam.recal_data.table \
+    --output $output_prefix.aln.sort.dupmark.rg.recal.bam
+    --emit_original_quals # emit the OQ tag with the original base qualities
+if [ $? -ne 0 ]; then
+    printf "$SCRIPT_NAME: error: GATK PrintReads returned with non-zero status\n"
+    exit -1
+fi
