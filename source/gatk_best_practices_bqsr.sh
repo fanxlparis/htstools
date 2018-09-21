@@ -7,7 +7,6 @@
 
 
 # !!!!!!!!!!!!!!! YOUR CUSTOM PATHS MIGHT BE REQUIRED HERE !!!!!!!!!!!!!!!!!!!!
-readonly num_threads=2
 readonly input_bam="ERR174310.aln.sort.dupmark.bam"
 # Output file will be: $output_prefix.recal.bam
 readonly output_prefix="ERR174310.aln.sort.dupmark"
@@ -56,13 +55,11 @@ readonly gatk="/project/omics/install/gatk-4.0.8.1/gatk"
 
 # Run the BaseRecalibrator.
 printf "$SCRIPT_NAME: running GATK's BaseRecalibrator\n"
-$gatk \
-    -T BaseRecalibrator \
-    -nct $num_threads \
-    -R $ref_fasta \
-    -I $input_bam \
-    -knownSites $dbsnp_vcf \
-    -o $output_prefix.bam.recal_data.table
+$gatk BaseRecalibrator \
+    --reference $ref_fasta \
+    --input $input_bam \
+    --known-sites $dbsnp_vcf \
+    --output $output_prefix.bam.recal_data.table
 if [ $? -ne 0 ]; then
     printf "$SCRIPT_NAME: error: GATK BaseRecalibrator returned with non-zero status\n"
     exit -1
@@ -70,13 +67,11 @@ fi
 
 # Create recalibrated BAM.
 printf "$SCRIPT_NAME: creating recalibrated BAM\n"
-$gatk \
-    -T PrintReads \
-    -nct $num_threads \
-    -R $ref_fasta \
-    -I $input_bam \
-    -BQSR $input_bam.recalibration_report.grp \
-    -o $output_prefix.recal.bam
+$gatk PrintReads \
+    --reference $ref_fasta \
+    --input $input_bam \
+    --BQSR $input_bam.recalibration_report.grp \
+    --output $output_prefix.recal.bam
     --emit_original_quals # emit the OQ tag with the original base qualities
 if [ $? -ne 0 ]; then
     printf "$SCRIPT_NAME: error: GATK PrintReads returned with non-zero status\n"
