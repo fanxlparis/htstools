@@ -58,6 +58,7 @@ readonly gatk="/project/omics/install/gatk-4.0.8.1/gatk"
 printf "$SCRIPT_NAME: running GATK's BaseRecalibrator\n"
 $gatk \
     -T BaseRecalibrator \
+    -nct $num_threads \
     -R $ref_fasta \
     -I $input_bam \
     -knownSites $dbsnp_vcf \
@@ -71,6 +72,7 @@ fi
 printf "$SCRIPT_NAME: creating recalibrated BAM\n"
 $gatk \
     -T PrintReads \
+    -nct $num_threads \
     -R $ref_fasta \
     -I $input_bam \
     -BQSR $input_bam.recalibration_report.grp \
