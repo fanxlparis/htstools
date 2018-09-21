@@ -34,7 +34,6 @@ fi
 # -----------------------------------------------------------------------------
 
 readonly ref_fasta="$gatk_bundle_path/human_g1k_v37.fasta"
-readonly dbsnps_vcf="$gatk_bundle_path/dbsnp_138.b37.vcf"
 
 # Check if the reference is indexed.
 if [ ! -f "${ref_fasta}.fai" ]; then
@@ -101,3 +100,14 @@ if [ $? -ne 0 ]; then
     printf "$SCRIPT_NAME: error: Picard returned with non-zero status\n"
     exit -1
 fi
+
+# Add read group.
+printf "$SCRIPT_NAME: adding read group\n"
+$java -jar $picard_jar AddOrReplaceReadGroups \
+    INPUT=$output_prefix.aln.sort.dupmark.bam \
+    OUTPUT=$output_prefix.aln.sort.dupmark.rg.bam \
+    RGID=1 \
+    RGLB=library \
+    RGPL=illumina \
+    RGPU=platform_unit \
+    RGSM=sample_name

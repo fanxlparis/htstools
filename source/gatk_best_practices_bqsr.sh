@@ -32,7 +32,7 @@ fi
 # -----------------------------------------------------------------------------
 
 readonly ref_fasta="$gatk_bundle_path/human_g1k_v37.fasta"
-readonly dbsnps_vcf="$gatk_bundle_path/dbsnp_138.b37.vcf"
+readonly dbsnp_vcf="$gatk_bundle_path/dbsnp_138.b37.vcf"
 
 # Check if the reference is indexed.
 if [ ! -f "${ref_fasta}.fai" ]; then
