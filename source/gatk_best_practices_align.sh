@@ -131,8 +131,8 @@ $gatk ApplyBQSR \
     --reference $ref_fasta \
     --input $output_prefix.aln.sort.dupmark.rg.bam \
     --bqsr-recal-file $output_prefix.aln.sort.dupmark.rg.bam.recal_data.table \
-    --output $output_prefix.aln.sort.dupmark.rg.recal.bam
-    --emit_original_quals # emit the OQ tag with the original base qualities
+    --output $output_prefix.aln.sort.dupmark.rg.recal.bam \
+    --emit-original-quals # emit the OQ tag with the original base qualities
 if [ $? -ne 0 ]; then
     printf "$SCRIPT_NAME: error: GATK ApplyBQSR returned with non-zero status\n"
     exit -1
