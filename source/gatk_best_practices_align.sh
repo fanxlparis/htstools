@@ -127,13 +127,13 @@ fi
 
 # Create recalibrated BAM.
 printf "$SCRIPT_NAME: creating recalibrated BAM\n"
-$gatk PrintReads \
+$gatk ApplyBQSR \
     --reference $ref_fasta \
     --input $output_prefix.aln.sort.dupmark.rg.bam \
-    --BQSR $output_prefix.aln.sort.dupmark.rg.bam.recal_data.table \
+    --bqsr-recal-file $output_prefix.aln.sort.dupmark.rg.bam.recal_data.table \
     --output $output_prefix.aln.sort.dupmark.rg.recal.bam
     --emit_original_quals # emit the OQ tag with the original base qualities
 if [ $? -ne 0 ]; then
-    printf "$SCRIPT_NAME: error: GATK PrintReads returned with non-zero status\n"
+    printf "$SCRIPT_NAME: error: GATK ApplyBQSR returned with non-zero status\n"
     exit -1
 fi
