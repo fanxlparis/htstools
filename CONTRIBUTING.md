@@ -1,4 +1,4 @@
-# Contributing to GABAC
+# Contributing to htstools
 
 First off, thanks for taking the time to contribute!
 
