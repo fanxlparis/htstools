@@ -14,13 +14,15 @@
 
 readonly num_threads=2
 
+# For single-ended data just leave $input_fastq_2 empty.
 readonly input_fastq_1="ERR174310_1.fastq"
 readonly input_fastq_2="ERR174310_2.fastq"
 
 # Output file will be: $output_prefix.aln.sort.dupmark.bam
 readonly output_prefix="ERR174310"
 
-readonly gatk_bundle_path="/home/voges/tmp/GATK_bundle-2.8-b37"
+# Tested with GATK bundle 2.8-b37.
+readonly gatk_bundle_path="/path/to/GATK_bundle-2.8-b37"
 
 
 # -----------------------------------------------------------------------------
@@ -93,7 +95,7 @@ $java -jar $picard_jar SortSam \
     OUTPUT=$output_prefix.aln.sort.bam \
     SORT_ORDER=coordinate
 if [ $? -ne 0 ]; then
-    printf "$SCRIPT_NAME: error: Picard returned with non-zero status\n"
+    printf "$SCRIPT_NAME: error: Picard SortSam returned with non-zero status\n"
     exit -1
 fi
 
@@ -105,7 +107,7 @@ $java -jar $picard_jar MarkDuplicates \
     METRICS_FILE=$output_prefix.dedup_metrics.txt \
     ASSUME_SORTED=true
 if [ $? -ne 0 ]; then
-    printf "$SCRIPT_NAME: error: Picard returned with non-zero status\n"
+    printf "$SCRIPT_NAME: error: Picard MarkDuplicates returned with non-zero status\n"
     exit -1
 fi
 
@@ -120,7 +122,7 @@ $java -jar $picard_jar AddOrReplaceReadGroups \
     RGPU=platform_unit \
     RGSM=sample_name
 if [ $? -ne 0 ]; then
-    printf "$SCRIPT_NAME: error: Picard returned with non-zero status\n"
+    printf "$SCRIPT_NAME: error: Picard AddOrReplaceReadGroups returned with non-zero status\n"
     exit -1
 fi
 
