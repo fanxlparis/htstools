@@ -119,6 +119,10 @@ $java -jar $picard_jar AddOrReplaceReadGroups \
     RGPL=illumina \
     RGPU=platform_unit \
     RGSM=sample_name
+if [ $? -ne 0 ]; then
+    printf "$SCRIPT_NAME: error: Picard returned with non-zero status\n"
+    exit -1
+fi
 
 # Run the BaseRecalibrator.
 printf "$SCRIPT_NAME: running GATK's BaseRecalibrator\n"
