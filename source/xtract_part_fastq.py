@@ -68,6 +68,9 @@ def main():
         if part_id == 3:
             sys.stdout.write(quality_scores + "\n")
 
+    # close the input file
+    close(file)
+
 
 if __name__ == "__main__":
     main()

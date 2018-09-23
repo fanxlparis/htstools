@@ -189,6 +189,8 @@ def main():
     print("{}: processed {} lines".format(script_name, line_cnt))
     print("{}: done".format(script_name))
 
+    # close input file
+    close(file)
 
 if __name__ == "__main__":
     main()

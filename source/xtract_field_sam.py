@@ -71,6 +71,9 @@ def main():
                     output = '\n'
         sys.stdout.write(output)
 
+    # close the input file
+    close(file)
+
 
 if __name__ == "__main__":
     main()
