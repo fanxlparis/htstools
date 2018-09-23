@@ -5,15 +5,32 @@
 #         Perform alignment according to the GATK Best Practices
 # =============================================================================
 
+# See also: https://software.broadinstitute.org/gatk/best-practices/
 
-# !!!!!!!!!!!!!!! YOUR CUSTOM PATHS MIGHT BE REQUIRED HERE !!!!!!!!!!!!!!!!!!!!
+
+# -----------------------------------------------------------------------------
+# Parameters
+# -----------------------------------------------------------------------------
+
 readonly num_threads=2
+
 readonly input_fastq_1="ERR174310_1.fastq"
 readonly input_fastq_2="ERR174310_2.fastq"
+
 # Output file will be: $output_prefix.aln.sort.dupmark.bam
 readonly output_prefix="ERR174310"
+
 readonly gatk_bundle_path="/home/voges/tmp/GATK_bundle-2.8-b37"
-# !!!!!!!!!!!!!!! YOUR CUSTOM PATHS MIGHT BE REQUIRED HERE !!!!!!!!!!!!!!!!!!!!
+
+
+# -----------------------------------------------------------------------------
+# Required programs
+# -----------------------------------------------------------------------------
+
+readonly bwa="/project/omics/install/bwa-0.7.13/bwa"
+readonly gatk="/project/omics/install/gatk-4.0.8.1/gatk"
+readonly java="/usr/bin/java"
+readonly picard_jar="/project/omics/install/picard-tools-2.18.14/picard.jar"
 
 
 # -----------------------------------------------------------------------------
@@ -45,17 +62,7 @@ fi
 
 
 # -----------------------------------------------------------------------------
-# Required programs
-# -----------------------------------------------------------------------------
-
-readonly bwa="/project/omics/install/bwa-0.7.13/bwa"
-readonly gatk="/project/omics/install/gatk-4.0.8.1/gatk"
-readonly java="/usr/bin/java"
-readonly picard_jar="/project/omics/install/picard-tools-2.18.14/picard.jar"
-
-
-# -----------------------------------------------------------------------------
-# Do it!
+# Do it.
 # -----------------------------------------------------------------------------
 
 # Generate BWA index.
