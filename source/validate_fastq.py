@@ -46,6 +46,9 @@ def main():
     quality_scores_min = sys.maxint
     quality_scores_max = -sys.maxint - 1
     quality_scores_cnt = 0
+    quality_scores_dist = []
+    for x in range(0, 128):
+        quality_scores_dist.append(0)
 
     while 1:
         # read a sequence identifier line
@@ -164,6 +167,7 @@ def main():
                     quality_scores_max = ord(q)
                 if ord(q) < quality_scores_min:
                     quality_scores_min = ord(q)
+                quality_scores_dist[ord(q)] += 1
             quality_scores_cnt += len(quality_scores)
         else:
             sys.exit("{}: {}:{}: "
@@ -177,6 +181,11 @@ def main():
           .format(script_name, quality_scores_min, quality_scores_max))
     print("{}: no. of quality scores: {}"
           .format(script_name, quality_scores_cnt))
+    print("{}: quality scores distribution:".format(script_name))
+    for x in range(0, 128):
+        if (quality_scores_dist[x] != 0):
+            print("{}:   {}: {}"
+                  .format(script_name, x, quality_scores_dist[x]))
     print("{}: processed {} lines".format(script_name, line_cnt))
     print("{}: done".format(script_name))
 
